@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 #  MongoDB Atlas connection (Vercel-compatible)
-client = MongoClient(os.environ.get("MONGODB_URI"))
+client = MongoClient(os.environ.get("MONGODB_URI_"))
 db = client["NotesApp"]
 notes_col = db["notes"]
 
