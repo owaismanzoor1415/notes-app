@@ -1,21 +1,76 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Note App</title>
-    </head>
-    <body>
-        <div class="conatiner">
-            <h1>My Notes</h1>
-            <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-            <div class="note-form">
-                <input type="text" id="title" placeholder="title">
-                <textarea id="content" placeholder="write your text"></textarea>
-                <button id="saveBtn">Save Note</button>
-            </div>
-            <h2>Saved Notes</h2>
-            <div id="notesConatiner" class="notes-grid">
-            </div>
-        </div>
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
-    </body>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Notes — NotesApp</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+<div class="logo">
+📝 NotesApp
+</div>
+
+<a href="/logout" class="logout-btn">
+Logout
+</a>
+
+</div>
+
+
+
+<!-- MAIN CONTAINER -->
+<div class="container">
+
+
+<div class="header">
+
+<h1>My Notes</h1>
+
+<p>Capture your thoughts beautifully ✨</p>
+
+</div>
+
+
+
+<!-- NOTE FORM -->
+<div class="note-form glass">
+
+<input
+type="text"
+id="title"
+placeholder="Enter note title..."
+>
+
+<textarea
+id="content"
+placeholder="Write your note here..."
+></textarea>
+
+<button id="saveBtn">
+Save Note
+</button>
+
+</div>
+
+
+
+<!-- NOTES GRID -->
+<div id="notesContainer" class="notes-grid"></div>
+
+
+</div>
+
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
 </html>
