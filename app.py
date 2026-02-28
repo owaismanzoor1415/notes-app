@@ -20,7 +20,7 @@ app = Flask(__name__)
 # ======================
 # MONGODB CONNECTION
 # ======================
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://127.0.0.1:27017")
+MONGO_URI = os.getenv("MONGO_URI")
 
 client = MongoClient(MONGO_URI)
 
