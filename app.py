@@ -12,24 +12,24 @@ load_dotenv()
 
 
 # ======================
-# FLASK APP SETUP
+# FLASK APP
 # ======================
 app = Flask(__name__)
 
 
 # ======================
-# MONGODB CONNECTION
+# SAFE MONGODB CONNECTION (RENDER FIX)
 # ======================
-MONGO_URI = os.getenv("MONGO_URI")
+def get_db():
 
-if not MONGO_URI:
-    raise RuntimeError("MONGO_URI not found in environment variables")
+    mongo_uri = os.getenv("MONGO_URI")
 
-client = MongoClient(MONGO_URI)
+    if not mongo_uri:
+        raise RuntimeError("MONGO_URI not set")
 
-db = client.notes_app
+    client = MongoClient(mongo_uri)
 
-notes = db.notes
+    return client.notes_app.notes
 
 
 # ======================
@@ -42,12 +42,14 @@ def notes_page():
 
 
 # ======================
-# API - GET NOTES
+# GET NOTES
 # ======================
 @app.route("/api/notes", methods=["GET"])
 def get_notes():
 
     try:
+
+        notes = get_db()
 
         data = list(notes.find().sort("_id", -1))
 
@@ -60,37 +62,26 @@ def get_notes():
 
         print("GET ERROR:", e)
 
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 
 # ======================
-# API - CREATE NOTE
+# CREATE NOTE
 # ======================
 @app.route("/api/notes", methods=["POST"])
 def create_note():
 
     try:
 
-        # force=True ensures JSON works on Render/Gunicorn
+        notes = get_db()
+
         data = request.get_json(force=True)
 
-        print("Incoming data:", data)
-
-        title = data.get("title", "")
-        content = data.get("content", "")
-
-        if not title and not content:
-            return jsonify({
-                "status": "error",
-                "message": "Note cannot be empty"
-            }), 400
+        print("POST DATA:", data)
 
         result = notes.insert_one({
-            "title": title,
-            "content": content
+            "title": data.get("title", ""),
+            "content": data.get("content", "")
         })
 
         return jsonify({
@@ -103,50 +94,19 @@ def create_note():
         print("POST ERROR:", e)
 
         return jsonify({
-            "status": "error",
-            "message": str(e)
+            "error": str(e)
         }), 500
 
 
 # ======================
-# API - UPDATE NOTE
-# ======================
-@app.route("/api/notes/<id>", methods=["PUT"])
-def update_note(id):
-
-    try:
-
-        data = request.get_json(force=True)
-
-        notes.update_one(
-            {"_id": ObjectId(id)},
-            {
-                "$set": {
-                    "title": data.get("title", ""),
-                    "content": data.get("content", "")
-                }
-            }
-        )
-
-        return jsonify({"status": "updated"}), 200
-
-    except Exception as e:
-
-        print("PUT ERROR:", e)
-
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
-
-
-# ======================
-# API - DELETE NOTE
+# DELETE NOTE
 # ======================
 @app.route("/api/notes/<id>", methods=["DELETE"])
 def delete_note(id):
 
     try:
+
+        notes = get_db()
 
         notes.delete_one({"_id": ObjectId(id)})
 
@@ -156,10 +116,7 @@ def delete_note(id):
 
         print("DELETE ERROR:", e)
 
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 
 # ======================
